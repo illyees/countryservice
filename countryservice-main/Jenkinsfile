@@ -13,50 +13,18 @@ pipeline {
             }
         }
         
-        stage('Diagnose Structure') {
+        stage('List Files') {
             steps {
                 sh '''
-                    echo "=== STRUCTURE DU DEPOT ==="
+                    echo "=== LISTING ALL FILES ==="
                     pwd
-                    echo "=== LISTE FICHIERS RACINE ==="
                     ls -la
-                    echo "=== RECHERCHE POM.XML ==="
-                    find . -name "pom.xml" -type f
-                    echo "=== STRUCTURE COMPLETE ==="
-                    find . -type f -name "*.java" | head -5
-                    find . -type f -name "*.xml" | head -5
+                    echo "=== FINDING POM ==="
+                    find . -name "pom.xml" 2>/dev/null || echo "No pom.xml found"
+                    echo "=== ALL FILES RECURSIVE ==="
+                    find . -type f | head -20
                 '''
             }
-        }
-        
-        stage('Build & Test') {
-            steps {
-                sh '''
-                    echo "=== TENTATIVE DE BUILD ==="
-                    # Essayer de trouver et construire depuis le bon dossier
-                    if [ -f "pom.xml" ]; then
-                        echo "Building from root directory"
-                        mvn clean compile
-                    else
-                        echo "No pom.xml in root, searching in subdirectories..."
-                        POM_DIR=$(find . -name "pom.xml" -type f -exec dirname {} \\; | head -1)
-                        if [ -n "$POM_DIR" ]; then
-                            echo "Found pom.xml in: $POM_DIR"
-                            cd "$POM_DIR"
-                            mvn clean compile
-                        else
-                            echo "ERROR: No pom.xml found anywhere!"
-                            exit 1
-                        fi
-                    fi
-                '''
-            }
-        }
-    }
-    
-    post {
-        always {
-            echo "Build ${currentBuild.currentResult} - ${env.JOB_NAME} #${env.BUILD_NUMBER}"
         }
     }
 }
