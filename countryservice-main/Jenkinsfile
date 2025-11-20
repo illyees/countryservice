@@ -1,28 +1,16 @@
 pipeline {
     agent any
-    
-    tools {
-        maven 'mymaven'
-        jdk 'JDK21'
-    }
-    
     stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/illyees/countryservice.git'
-            }
-        }
-        
-        stage('List Files') {
+        stage('List Structure') {
             steps {
                 sh '''
-                    echo "=== LISTING ALL FILES ==="
+                    echo "=== STARTING DIAGNOSIS ==="
                     pwd
                     ls -la
-                    echo "=== FINDING POM ==="
-                    find . -name "pom.xml" 2>/dev/null || echo "No pom.xml found"
-                    echo "=== ALL FILES RECURSIVE ==="
-                    find . -type f | head -20
+                    echo "=== FINDING FILES ==="
+                    find . -type f | head -30
+                    echo "=== SPECIFICALLY POM ==="
+                    find . -name "pom.xml" -type f
                 '''
             }
         }
