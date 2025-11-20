@@ -1,0 +1,40 @@
+# Build outputs
+target/
+bin/
+build/
+*.jar
+*.war
+*.ear
+*.class
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Log files
+*.log
+logs/
+
+# Database files (H2)
+*.db
+*.trace
+*.log
+
+# Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+
+# Environment files (ne jamais pousser les fichiers d'environnement)
+.env
+application-dev.properties
+application-prod.properties

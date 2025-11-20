@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: country-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: countryservice
+  template:
+    metadata:
+      labels:
+        app: countryservice
+    spec:
+      containers:
+      - name: countryservice
+        image: oumaymariahi/countryservice:v2
+        ports:
+        - containerPort: 8082
