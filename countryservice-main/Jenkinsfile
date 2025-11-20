@@ -18,12 +18,13 @@ pipeline {
                 sh '''
                     echo "=== STRUCTURE DU DEPOT ==="
                     pwd
+                    echo "=== LISTE FICHIERS RACINE ==="
                     ls -la
-                    echo "=== CONTENU ==="
+                    echo "=== RECHERCHE POM.XML ==="
                     find . -name "pom.xml" -type f
-                    echo "=== LISTE COMPLETE ==="
-                    find . -type f -name "*.java" | head -10
-                    find . -type f -name "*.xml" | head -10
+                    echo "=== STRUCTURE COMPLETE ==="
+                    find . -type f -name "*.java" | head -5
+                    find . -type f -name "*.xml" | head -5
                 '''
             }
         }
@@ -37,8 +38,16 @@ pipeline {
                         echo "Building from root directory"
                         mvn clean compile
                     else
-                        echo "No pom.xml in root, searching..."
-                        find . -name "pom.xml" -exec dirname {} \\; | head -1 | xargs -I {} sh -c 'cd {} && mvn clean compile'
+                        echo "No pom.xml in root, searching in subdirectories..."
+                        POM_DIR=$(find . -name "pom.xml" -type f -exec dirname {} \\; | head -1)
+                        if [ -n "$POM_DIR" ]; then
+                            echo "Found pom.xml in: $POM_DIR"
+                            cd "$POM_DIR"
+                            mvn clean compile
+                        else
+                            echo "ERROR: No pom.xml found anywhere!"
+                            exit 1
+                        fi
                     fi
                 '''
             }
