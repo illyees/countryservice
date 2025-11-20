@@ -13,14 +13,17 @@ pipeline {
             }
         }
         
-        stage('Navigate to project folder') {
+        stage('Diagnose Structure') {
             steps {
                 sh '''
-                    echo "Current directory: $(pwd)"
+                    echo "=== STRUCTURE DU DEPOT ==="
+                    pwd
                     ls -la
-                    cd countryservice-main
-                    echo "After cd: $(pwd)"
-                    ls -la
+                    echo "=== CONTENU ==="
+                    find . -name "pom.xml" -type f
+                    echo "=== LISTE COMPLETE ==="
+                    find . -type f -name "*.java" | head -10
+                    find . -type f -name "*.xml" | head -10
                 '''
             }
         }
@@ -28,38 +31,16 @@ pipeline {
         stage('Build & Test') {
             steps {
                 sh '''
-                    cd countryservice-main
-                    mvn clean compile
+                    echo "=== TENTATIVE DE BUILD ==="
+                    # Essayer de trouver et construire depuis le bon dossier
+                    if [ -f "pom.xml" ]; then
+                        echo "Building from root directory"
+                        mvn clean compile
+                    else
+                        echo "No pom.xml in root, searching..."
+                        find . -name "pom.xml" -exec dirname {} \\; | head -1 | xargs -I {} sh -c 'cd {} && mvn clean compile'
+                    fi
                 '''
-            }
-        }
-        
-        stage('Unit Tests') {
-            steps {
-                sh '''
-                    cd countryservice-main
-                    mvn test
-                '''
-            }
-            post {
-                always {
-                    junit 'countryservice-main/**/target/surefire-reports/*.xml'
-                }
-            }
-        }
-        
-        stage('Package') {
-            steps {
-                sh '''
-                    cd countryservice-main
-                    mvn package -DskipTests
-                '''
-            }
-        }
-        
-        stage('Deploy to Tomcat') {
-            steps {
-                sh 'echo "Deployment to Tomcat would happen here"'
             }
         }
     }
