@@ -82,8 +82,8 @@ public class ControllerMockMvcTests {
         this.mockMvc.perform(get("/getcountries/{id}", countryID))
         .andExpect(status().isFound())
         .andExpect(MockMvcResultMatchers.jsonPath(".id").value(1))
-        .andExpect(MockMvcResultMatchers.jsonPath(".countryName").value("India")) // Changé de ".name" à ".countryName"
-        .andExpect(MockMvcResultMatchers.jsonPath(".capital").value("Delhi"))
+        .andExpect(MockMvcResultMatchers.jsonPath(".countryName").value("India")) // Utilise countryName
+        .andExpect(MockMvcResultMatchers.jsonPath(".capitalName").value("Delhi")) // Utilise capitalName
         .andDo(print());
     }
     
@@ -98,8 +98,8 @@ public class ControllerMockMvcTests {
         this.mockMvc.perform(get("/getcountries/countryname").param("name", "India"))
         .andExpect(status().isFound())
         .andExpect(MockMvcResultMatchers.jsonPath(".id").value(1))
-        .andExpect(MockMvcResultMatchers.jsonPath(".countryName").value("India")) // Changé de ".name" à ".countryName"
-        .andExpect(MockMvcResultMatchers.jsonPath(".capital").value("Delhi"))
+        .andExpect(MockMvcResultMatchers.jsonPath(".countryName").value("India")) // Utilise countryName
+        .andExpect(MockMvcResultMatchers.jsonPath(".capitalName").value("Delhi")) // Utilise capitalName
         .andDo(print());
     }    
     
@@ -138,8 +138,8 @@ public class ControllerMockMvcTests {
                     .contentType(MediaType.APPLICATION_JSON)
                     )
         .andExpect(status().isOk())
-        .andExpect(MockMvcResultMatchers.jsonPath(".countryName").value("Japan")) // Changé de ".name" à ".countryName"
-        .andExpect(MockMvcResultMatchers.jsonPath(".capital").value("Tokyo"))
+        .andExpect(MockMvcResultMatchers.jsonPath(".countryName").value("Japan")) // Utilise countryName
+        .andExpect(MockMvcResultMatchers.jsonPath(".capitalName").value("Tokyo")) // Utilise capitalName
         .andDo(print());
     }
     
