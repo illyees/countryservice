@@ -1,18 +1,1 @@
-pipeline {
-    agent any
-    stages {
-        stage('List Structure') {
-            steps {
-                sh '''
-                    echo "=== STARTING DIAGNOSIS ==="
-                    pwd
-                    ls -la
-                    echo "=== FINDING FILES ==="
-                    find . -type f | head -30
-                    echo "=== SPECIFICALLY POM ==="
-                    find . -name "pom.xml" -type f
-                '''
-            }
-        }
-    }
-}
+
