@@ -53,7 +53,10 @@ pipeline {
         
         stage('Deploy to Tomcat') {
             steps {
-                sh 'echo "Deployment to Tomcat would happen here"'
+                sh '''
+            curl --upload-file target/countryservice.war \
+                 "http://tomcat-user:tomcat-password@tomcat-server:8080/manager/text/deploy?path=/countryservice&update=true"
+        '''
             }
         }
     }
