@@ -83,7 +83,7 @@ public class ControllerMockMvcTests {
 		
 		this.mockMvc.perform(get("/getcountries/{id}", countryID))
 		.andExpect(status().isFound())
-		.andExpect(MockMvcResultMatchers.jsonPath(".idCountry").value(1)) //private names attributes of country
+		.andExpect(MockMvcResultMatchers.jsonPath(".id").value(1)) //private names attributes of country
 		.andExpect(MockMvcResultMatchers.jsonPath(".name").value("India"))
 		.andExpect(MockMvcResultMatchers.jsonPath(".capital").value("Delhi"))
 		.andDo(print());
@@ -99,7 +99,7 @@ public class ControllerMockMvcTests {
 		
 		this.mockMvc.perform(get("/getcountries/countryname").param("name","India"))
 		.andExpect(status().isFound())
-		.andExpect(MockMvcResultMatchers.jsonPath(".idCountry").value(1)) //private names attributes of country
+		.andExpect(MockMvcResultMatchers.jsonPath(".id").value(1)) //private names attributes of country
 		.andExpect(MockMvcResultMatchers.jsonPath(".name").value("India"))
 		.andExpect(MockMvcResultMatchers.jsonPath(".capital").value("Delhi"))
 		.andDo(print());
