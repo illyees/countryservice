@@ -7,11 +7,9 @@ pipeline {
     }
     
     environment {
-        NEXUS_URL = 'http://your-nexus-server:8081'
-        NEXUS_CREDENTIALS = credentials('nexus-credentials')
-        TOMCAT_URL = 'http://your-tomcat-server:8080'
-        TOMCAT_CREDENTIALS = credentials('tomcat-credentials')
-        SONARQUBE_SCANNER = 'sonar-scanner'
+        TOMCAT_URL = 'http://localhost:8080'
+        TOMCAT_USER = 'deployer'
+        TOMCAT_PASSWORD = 'deployer123'
     }
     
     stages {
@@ -38,51 +36,32 @@ pipeline {
             }
         }
         
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('sonar-server') {
-                    sh 'mvn sonar:sonar -Dsonar.projectKey=countryservice'
-                }
-            }
-        }
-        
-        stage('Package') {
+        stage('Package WAR') {
             steps {
                 sh 'mvn package -DskipTests'
-            }
-        }
-        
-        stage('Upload to Nexus') {
-            steps {
-                script {
-                    // Trouver le fichier WAR généré
-                    def warFile = findFiles(glob: '**/target/*.war')[0]
-                    
-                    // Téléverser vers Nexus
-                    sh """
-                        curl -u $NEXUS_CREDENTIALS \
-                             -X POST \
-                             -F "maven2.asset1=@${warFile.path}" \
-                             -F "maven2.asset1.extension=war" \
-                             -F "maven2.asset1.groupId=com.countryservice" \
-                             -F "maven2.asset1.version=${env.BUILD_NUMBER}" \
-                             "$NEXUS_URL/service/rest/v1/components?repository=maven-releases"
-                    """
-                }
+                sh 'ls -la target/*.war'
             }
         }
         
         stage('Deploy to Tomcat') {
             steps {
                 script {
-                    def warFile = findFiles(glob: '**/target/*.war')[0]
-                    
-                    // Déployer sur Tomcat via le manager
-                    sh """
-                        curl -u $TOMCAT_CREDENTIALS \
-                             --upload-file ${warFile.path} \
-                             "$TOMCAT_URL/manager/text/deploy?path=/countryservice&update=true"
-                    """
+                    // Vérifier que le WAR existe
+                    def warFiles = findFiles(glob: 'target/*.war')
+                    if (warFiles.length > 0) {
+                        def warFile = warFiles[0]
+                        echo "🎯 Fichier WAR trouvé: ${warFile.path}"
+                        
+                        // Déployer sur Tomcat
+                        sh """
+                            echo "📦 Déploiement sur Tomcat..."
+                            curl -v -u $TOMCAT_USER:$TOMCAT_PASSWORD \
+                                 --upload-file ${warFile.path} \
+                                 "$TOMCAT_URL/manager/text/deploy?path=/countryservice&update=true"
+                        """
+                    } else {
+                        error "❌ Aucun fichier WAR trouvé!"
+                    }
                 }
             }
         }
@@ -90,21 +69,13 @@ pipeline {
     
     post {
         always {
-            echo "Build ${currentBuild.currentResult} - ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+            echo "🏁 Build ${currentBuild.currentResult} - ${env.JOB_NAME} #${env.BUILD_NUMBER}"
         }
         success {
-            emailext (
-                subject: "SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-                body: "Le déploiement de countryservice a réussi!\n${env.BUILD_URL}",
-                to: "dev-team@company.com"
-            )
+            echo "✅ Déploiement réussi! Vérifiez: $TOMCAT_URL/countryservice"
         }
         failure {
-            emailext (
-                subject: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-                body: "Le déploiement de countryservice a échoué.\n${env.BUILD_URL}",
-                to: "dev-team@company.com"
-            )
+            echo "❌ Le déploiement a échoué"
         }
     }
 }
