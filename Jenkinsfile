@@ -6,6 +6,16 @@ pipeline {
         jdk 'JDK21'
     }
     
+    stage('Diagnostic') {
+    steps {
+        sh '''
+            echo "=== STRUCTURE ANALYSIS ==="
+            pwd
+            ls -la
+            find . -name "pom.xml" -type f
+        '''
+    }
+}
     stages {
         stage('Checkout') {
             steps {
