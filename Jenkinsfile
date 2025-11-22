@@ -35,6 +35,11 @@ pipeline {
                 sh 'mvn package -DskipTests'
             }
         }
+        stage('display message') {
+            steps {
+                echo 'Hello from github'
+            }
+        }
         
         stage('Deploy to Tomcat') {
             steps {
