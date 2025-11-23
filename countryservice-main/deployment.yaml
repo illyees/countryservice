@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: countryservice
-        image: oumaymariahi/countryservice:v2
+        image: illyees/countryservice:v2
         ports:
         - containerPort: 8082
